@@ -17,6 +17,8 @@ SoonTM
 - Config file should be created in configs/plugins/
 - Edit to your liking,
 
+Map advert placements are stored separately in `addons/counterstrikesharp/configs/plugins/CS2_Poor_MapAdvertisements/maps/`. On first start, existing files from the old plugin-local `maps/` folder are copied there automatically.
+
 ## [📝] Configuration
 | Option  | Description |
 | ------------- | ------------- |

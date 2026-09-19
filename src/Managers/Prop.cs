@@ -15,9 +15,42 @@ namespace CS2_Poor_MapAdvertisements.Managers
         public readonly List<PropModel> _newPropModels = [];
         private static readonly object _fileLock = new();
 
+        private string MapStorageDirectory => Path.GetFullPath(Path.Combine(
+            _plugin.ModuleDirectory,
+            "..", "..", "configs", "plugins", _plugin.ModuleName, "maps"));
+
+        public void MigrateLegacyMapFiles()
+        {
+            var legacyDirectory = Path.Combine(_plugin.ModuleDirectory, "maps");
+            if (!Directory.Exists(legacyDirectory)) return;
+
+            try
+            {
+                Directory.CreateDirectory(MapStorageDirectory);
+
+                foreach (var legacyFile in Directory.EnumerateFiles(legacyDirectory, "*.json"))
+                {
+                    var newFile = Path.Combine(MapStorageDirectory, Path.GetFileName(legacyFile));
+                    if (!File.Exists(newFile))
+                    {
+                        File.Copy(legacyFile, newFile);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                _plugin.DebugMode($"Map data migration: {e}");
+            }
+        }
+
+        public void SetMapFilePath(string mapName)
+        {
+            _mapFilePath = Path.Combine(MapStorageDirectory, $"{Path.GetFileName(mapName)}.json");
+        }
+
         public void GenerateJsonFile()
         {
-            string directoryPath = Path.Combine(_plugin.ModuleDirectory, "maps");
+            string directoryPath = Path.GetDirectoryName(_mapFilePath!)!;
             try
             {
                 if (!Directory.Exists(directoryPath))

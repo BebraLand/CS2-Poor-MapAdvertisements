@@ -38,6 +38,8 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
         PropManager = new PropManager(this);
         MenuManager = new PluginMenu(this);
 
+        PropManager.MigrateLegacyMapFiles();
+
         EventManager.RegisterEvents();
         CommandsManager.RegisterCommands();
 

@@ -161,7 +161,7 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         Server.NextFrame(() =>
         {
             _plugin.PropManager._mapName = mapName;
-            _plugin.PropManager!._mapFilePath = Path.Combine(_plugin.ModuleDirectory, "maps", $"{mapName}.json");
+            _plugin.PropManager!.SetMapFilePath(mapName);
 
             _plugin.PropManager.GenerateJsonFile();
             Server.NextFrame(() =>
