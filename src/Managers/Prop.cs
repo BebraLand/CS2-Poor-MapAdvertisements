@@ -13,7 +13,10 @@ namespace CS2_Poor_MapAdvertisements.Managers
         public string? _mapFilePath;
         public readonly List<PropModel> _props = [];
         public readonly List<PropModel> _newPropModels = [];
+        private readonly Stack<PropModel> _undoHistory = [];
         private static readonly object _fileLock = new();
+
+        public bool HasUndoablePlacement => _undoHistory.Any(_props.Contains);
 
         private string MapStorageDirectory => Path.GetFullPath(Path.Combine(
             _plugin.ModuleDirectory,
@@ -94,6 +97,7 @@ namespace CS2_Poor_MapAdvertisements.Managers
                     EntityProp = entityProp
                 };
                 _props.Add(model);
+                _undoHistory.Push(model);
 
                 var options = new JsonSerializerOptions { WriteIndented = true };
                 File.WriteAllText(_mapFilePath!, JsonSerializer.Serialize(_props, options));
@@ -103,6 +107,7 @@ namespace CS2_Poor_MapAdvertisements.Managers
 
         public void LoadPropsFromMap()
         {
+            _undoHistory.Clear();
             if (File.Exists(_mapFilePath))
             {
                 string json = File.ReadAllText(_mapFilePath);
@@ -168,6 +173,20 @@ namespace CS2_Poor_MapAdvertisements.Managers
             }
         }
 
+        public int? UndoLastPlacement()
+        {
+            while (_undoHistory.TryPop(out var prop))
+            {
+                var index = _props.IndexOf(prop);
+                if (index >= 0 && RemovePropFromFile(index))
+                {
+                    return prop.Id;
+                }
+            }
+
+            return null;
+        }
+
         public int RemoveAllProps()
         {
             lock (_fileLock)
@@ -183,6 +202,7 @@ namespace CS2_Poor_MapAdvertisements.Managers
                 }
 
                 _props.Clear();
+                _undoHistory.Clear();
                 File.WriteAllText(_mapFilePath!, "[]");
                 return removedCount;
             }

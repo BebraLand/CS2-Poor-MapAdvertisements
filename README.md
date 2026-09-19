@@ -54,6 +54,9 @@ Tried to make plugin idiot proof (since I did a lot of mistakes).
 | Command  | Description |
 | ------------- | ------------- |
 | css_mapadverts | Menu that allows to setup advertisements |
+| css_mapadverts_undo | Removes the last advert placed since the current map load |
+
+While “Spawn on Ping” is enabled, the plugin temporarily sets the server's `player_ping_token_cooldown` to `0`, then restores its previous value once no admin is placing adverts via ping. This is a global server setting for that short setup period.
 
 
 ## [❤️] Special thanks to:

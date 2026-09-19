@@ -43,6 +43,17 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
             RemoveAdvertsMenu(player, menu);
         });
 
+        if (_plugin.PropManager!.HasUndoablePlacement)
+        {
+            menu.AddItem($"{_plugin.Localizer["UndoLastAdvertMenu"]}", (p, o) =>
+            {
+                var removedId = _plugin.PropManager.UndoLastPlacement();
+                p.PrintToChat($"{_plugin.Localizer["Prefix"]}{(removedId.HasValue ? _plugin.Localizer["SuccessUndo", removedId.Value] : _plugin.Localizer["NothingToUndo"])}");
+                o.PostSelectAction = PostSelectAction.Close;
+                Server.NextFrame(() => ShowMapAdvertMenu(p));
+            });
+        }
+
         if (_plugin.PropManager!._props.Count > 0)
         {
             menu.AddItem($"{_plugin.Localizer["RemoveAllAdvertsMenu"]}", (p, o) =>

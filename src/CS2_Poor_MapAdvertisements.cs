@@ -51,6 +51,7 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
     }
     public override void Unload(bool hotReload)
     {
+        EventManager?.RestorePingCooldown();
         Console.WriteLine("Unloaded CS2_Poor_MapAdvertisements");
     }
 

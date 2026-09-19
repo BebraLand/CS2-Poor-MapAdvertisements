@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
 
 namespace CS2_Poor_MapAdvertisements.Managers;
@@ -9,6 +10,8 @@ namespace CS2_Poor_MapAdvertisements.Managers;
 public class EventManager(CS2_Poor_MapAdvertisements plugin)
 {
     private readonly CS2_Poor_MapAdvertisements _plugin = plugin;
+    private string? _savedPingTokenCooldown;
+    private bool _pingCooldownDisabled;
     public void RegisterEvents()
     {
         //Events:
@@ -32,13 +35,44 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
 
     private void OnTick()
     {
+        var placingViaPing = false;
         foreach(var player in _plugin.MenuManager!._selectedMaterial)
         {
             if(player.Value.onPing)
             {
+                placingViaPing = true;
                 player.Key.PrintToCenterHtml($"{_plugin.Localizer["OnTickNotification", player.Value.material!]}");
             }
         }
+
+        UpdatePingCooldown(placingViaPing);
+    }
+
+    public void RestorePingCooldown()
+    {
+        if (!_pingCooldownDisabled || _savedPingTokenCooldown == null) return;
+
+        ConVar.Find("player_ping_token_cooldown")?.SetValue(_savedPingTokenCooldown);
+        _savedPingTokenCooldown = null;
+        _pingCooldownDisabled = false;
+    }
+
+    private void UpdatePingCooldown(bool placingViaPing)
+    {
+        if (placingViaPing == _pingCooldownDisabled) return;
+
+        var pingTokenCooldown = ConVar.Find("player_ping_token_cooldown");
+        if (pingTokenCooldown == null) return;
+
+        if (placingViaPing)
+        {
+            _savedPingTokenCooldown = pingTokenCooldown.StringValue;
+            pingTokenCooldown.SetValue(0.0f);
+            _pingCooldownDisabled = true;
+            return;
+        }
+
+        RestorePingCooldown();
     }
 
     private HookResult OnPlayerChatListener(CCSPlayerController? player, CommandInfo commandInfo)
