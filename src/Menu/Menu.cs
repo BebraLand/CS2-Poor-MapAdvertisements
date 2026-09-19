@@ -43,6 +43,14 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
             RemoveAdvertsMenu(player, menu);
         });
 
+        if (_plugin.PropManager!._props.Count > 0)
+        {
+            menu.AddItem($"{_plugin.Localizer["RemoveAllAdvertsMenu"]}", (p, o) =>
+            {
+                RemoveAllAdvertsConfirmation(player, menu);
+            });
+        }
+
         menu.AddItem($"{_plugin.Localizer["SaveAdvertsMenu"]}", (p, o) =>
         {
             try
@@ -89,6 +97,33 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
                 });
             });
         }
+
+        menu.PrevMenu = prevMenu;
+        menu.Display(player, 0);
+    }
+
+    private void RemoveAllAdvertsConfirmation(CCSPlayerController player, WasdMenu prevMenu)
+    {
+        var advertCount = _plugin.PropManager!._props.Count;
+        if (advertCount == 0)
+        {
+            ShowMapAdvertMenu(player);
+            return;
+        }
+
+        WasdMenu menu = new($"{_plugin.Localizer["RemoveAllAdvertsConfirmHeader", advertCount]}", _plugin);
+        menu.AddItem($"{_plugin.Localizer["RemoveAllAdvertsConfirm"]}", (p, o) =>
+        {
+            var removedCount = _plugin.PropManager.RemoveAllProps();
+            p.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["SuccessRemoveAll", removedCount]}");
+            o.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => ShowMapAdvertMenu(p));
+        });
+        menu.AddItem($"{_plugin.Localizer["Cancel"]}", (p, o) =>
+        {
+            o.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => ShowMapAdvertMenu(p));
+        });
 
         menu.PrevMenu = prevMenu;
         menu.Display(player, 0);

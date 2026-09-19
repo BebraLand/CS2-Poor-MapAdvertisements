@@ -110,16 +110,49 @@ namespace CS2_Poor_MapAdvertisements.Managers
         {
             return id >= 0 && id < _props.Count ? _props[id] : null;
         }
-        public void RemovePropFromFile(int id)
+        public bool RemovePropFromFile(int id)
         {
-            _props.RemoveAt(id);
-
-            for (int i = 0; i < _props.Count; i++)
+            lock (_fileLock)
             {
-                _props[i].Id = i;
+                if (id < 0 || id >= _props.Count) return false;
+
+                var prop = _props[id];
+                if (prop.EntityProp?.IsValid == true)
+                {
+                    prop.EntityProp.Remove();
+                }
+
+                _props.RemoveAt(id);
+
+                for (int i = 0; i < _props.Count; i++)
+                {
+                    _props[i].Id = i;
+                }
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                File.WriteAllText(_mapFilePath!, JsonSerializer.Serialize(_props, options));
+                return true;
             }
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            File.WriteAllText(_mapFilePath!, JsonSerializer.Serialize(_props, options));
+        }
+
+        public int RemoveAllProps()
+        {
+            lock (_fileLock)
+            {
+                var removedCount = _props.Count;
+
+                foreach (var prop in _props)
+                {
+                    if (prop.EntityProp?.IsValid == true)
+                    {
+                        prop.EntityProp.Remove();
+                    }
+                }
+
+                _props.Clear();
+                File.WriteAllText(_mapFilePath!, "[]");
+                return removedCount;
+            }
         }
 
         public void SavePropConfiguration(CBaseEntity entity, PropModel prop)
