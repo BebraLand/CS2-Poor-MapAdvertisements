@@ -15,6 +15,9 @@ namespace CS2_Poor_MapAdvertisements.Config
         [JsonPropertyName("Props Path")]
         public string[] Props { get; set; } = [];
 
+        [JsonPropertyName("MatchZy Map Integration")]
+        public MapIntegrationConfig MapIntegration { get; set; } = new();
+
         [JsonPropertyName("Custom Position Values")]
         public int[] customPositionValues { get; set; } = [];
 
@@ -27,5 +30,11 @@ namespace CS2_Poor_MapAdvertisements.Config
         [JsonPropertyName("Debug Mode")]
         public bool Debug { get; set; } = true;
 
+    }
+
+    public class MapIntegrationConfig
+    {
+        public bool Enabled { get; set; } = false;
+        public string[] Materials { get; set; } = [];
     }
 }

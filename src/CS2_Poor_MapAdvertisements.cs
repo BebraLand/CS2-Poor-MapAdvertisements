@@ -22,6 +22,7 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
 
     public EventManager? EventManager { get; private set; }
     public PropManager? PropManager { get; private set; }
+    public MapIntegration? MapIntegration { get; private set; }
 
     public PluginUtils? PluginUtils { get; private set; }
     public CommandsManager? CommandsManager { get; private set; }
@@ -37,6 +38,8 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
         CommandsManager = new CommandsManager(this);
         PropManager = new PropManager(this);
         MenuManager = new PluginMenu(this);
+        MapIntegration = new MapIntegration(this);
+        MapIntegration.Start();
 
         PropManager.MigrateLegacyMapFiles();
 
@@ -47,11 +50,13 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
 
     public void OnConfigParsed(PluginConfig config)
     {
+        config.MapIntegration ??= new();
         Config = config;
     }
     public override void Unload(bool hotReload)
     {
         EventManager?.RestorePingCooldown();
+        MapIntegration?.Stop();
         Console.WriteLine("Unloaded CS2_Poor_MapAdvertisements");
     }
 

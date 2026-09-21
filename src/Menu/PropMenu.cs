@@ -12,6 +12,7 @@ public partial class PluginMenu
 {
     public void CreatePropMenu(CCSPlayerController player, WasdMenu? prevMenu)
     {
+        _plugin.MapIntegration!.SetPreview(player, 0);
         if (player == null) return;
         var pawn = player.PlayerPawn.Value;
         if (pawn == null || !pawn.IsValid) return;

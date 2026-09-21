@@ -50,10 +50,28 @@ Map advert placements are stored separately in `addons/counterstrikesharp/config
 ```
 
 ## [🛡️] Admin commands
+### Optional MatchZy integration
+
+Disabled by default. The two plugins remain usable independently; when enabled,
+this plugin reads the current series map from MatchZy's CounterStrikeSharp
+capability and selects one of up to five configured materials.
+
+Configure `MatchZy Map Integration` with `Enabled: true` and up to five valid
+`materials/.../*.vmat` paths, then reload the map. Open `css_mapadverts_matchzy`,
+choose a preview material and the
+new slot's width, height and depth, then enable ping placement. Each ping saves
+one slot for the current map; position and rotation can be edited later.
+
+BO1, BO3 and BO5 use one-based MAP numbers. Slots are shown to players during an
+active series and previewed to admins outside a series. Stale or invalid state,
+map transitions and disabled integration hide the slots. Ordinary adverts and
+their storage are unchanged.
+
 Tried to make plugin idiot proof (since I did a lot of mistakes).
 | Command  | Description |
 | ------------- | ------------- |
 | css_mapadverts | Menu that allows to setup advertisements |
+| css_mapadverts_matchzy | Optional MatchZy map-slot setup |
 | css_mapadverts_undo | Removes the last advert placed since the current map load |
 
 While “Spawn on Ping” is enabled, the plugin temporarily sets the server's `player_ping_token_cooldown` to `0`, then restores its previous value once no admin is placing adverts via ping. This is a global server setting for that short setup period.

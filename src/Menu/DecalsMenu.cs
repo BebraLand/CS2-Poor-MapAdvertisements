@@ -13,6 +13,7 @@ public partial class PluginMenu
     // Decal menus:
     public void CreateDecalMenu(CCSPlayerController player, WasdMenu? prevMenu)
     {
+        _plugin.MapIntegration!.SetPreview(player, 0);
         if (player == null) return;
         var pawn = player.PlayerPawn.Value;
         if (pawn == null || !pawn.IsValid) return;
@@ -104,7 +105,7 @@ public partial class PluginMenu
     {
         if (player == null) return;
         WasdMenu menu = new($"{_plugin.Localizer["Material_Header"]}", _plugin);
-        foreach (var material in _plugin.Config.Props)
+        foreach (var material in DecalMaterials())
         {
             if (!_plugin.PluginUtils!.CheckMaterial(material))
             {
@@ -430,7 +431,7 @@ public partial class PluginMenu
         var entity = prop.EntityProp;
         if (entity == null) return;
 
-        foreach (var material in _plugin.Config.Props)
+        foreach (var material in DecalMaterials())
         {
             if (!_plugin.PluginUtils!.CheckMaterial(material))
             {

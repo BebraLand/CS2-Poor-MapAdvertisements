@@ -87,6 +87,12 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
         menu.Display(player, 0);
     }
 
+    private IEnumerable<string> DecalMaterials()
+        => (_plugin.Config.Props ?? [])
+            .Concat(_plugin.Config.MapIntegration?.Materials ?? [])
+            .Where(path => !string.IsNullOrWhiteSpace(path))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
     private void RemoveAdvertsMenu(CCSPlayerController player, WasdMenu prevMenu)
     {
         if (player == null) return;

@@ -14,6 +14,11 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
         if (_plugin.Config.EnableCMD)
         {
             _plugin.AddCommand("css_mapadverts", "Map advertisements menu", OnMapAdvert);
+            _plugin.AddCommand("css_mapadverts_matchzy", "Optional MatchZy map integration", (player, _) =>
+            {
+                if (player != null && AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag))
+                    _plugin.MenuManager!.ShowMapIntegrationMenu(player);
+            });
             _plugin.AddCommand("css_mapadverts_undo", "Undo last map advert placement", OnUndoLastAdvert);
         }
     }

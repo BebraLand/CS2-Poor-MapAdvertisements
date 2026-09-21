@@ -21,9 +21,12 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         //Listeners:
         _plugin.RegisterListener<Listeners.OnServerPrecacheResources>((ResourceManifest manifest) =>
         {
-            foreach (var prop in _plugin.Config.Props)
+            foreach (var material in (_plugin.Config.Props ?? [])
+                .Concat(_plugin.Config.MapIntegration?.Materials ?? [])
+                .Where(path => !string.IsNullOrWhiteSpace(path))
+                .Distinct(StringComparer.OrdinalIgnoreCase))
             {
-                manifest.AddResource(prop);
+                manifest.AddResource(material);
             }
         });
         _plugin.RegisterListener<Listeners.OnMapStart>(OnMapStart);
@@ -35,7 +38,10 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
 
     private void OnTick()
     {
-        var placingViaPing = false;
+        var placingViaPing = _plugin.MapIntegration?.IsPlacing == true;
+        foreach (var player in _plugin.MapIntegration!.Placing)
+            if (player.IsValid)
+                player.PrintToCenterHtml("Map Integration: ping a wall to save a slot.<br>Stop: !mapadverts_matchzy");
         foreach(var player in _plugin.MenuManager!._selectedMaterial)
         {
             if(player.Value.onPing)
@@ -116,6 +122,18 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         var player = ping.Userid;
         if (player == null) return HookResult.Continue;
 
+        if (AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag)
+            && _plugin.MapIntegration!.Placing.Contains(player))
+        {
+            try { _plugin.MapIntegration.Place(player, new Vector(ping.X, ping.Y, ping.Z)); }
+            catch (Exception ex)
+            {
+                player.PrintToChat("[Map Integration] Could not save slot. Check server logs.");
+                _plugin.DebugMode(ex.ToString());
+            }
+            return HookResult.Continue;
+        }
+
         if (!AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag) || !_plugin.MenuManager!._selectedMaterial.TryGetValue(player, out var selected))
         {
             return HookResult.Continue;
@@ -139,6 +157,7 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
 
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
+        _plugin.MapIntegration!.CheckTransmit(infoList);
         var decals = Utilities.FindAllEntitiesByDesignerName<CEnvDecal>("env_decal");
         var props = Utilities.FindAllEntitiesByDesignerName<CPhysicsPropOverride>("prop_physics_override");
 
