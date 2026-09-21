@@ -187,6 +187,8 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
         undo.Push(slot);
         Refresh();
         player.PrintToChat($"[Map Integration] Saved slot #{slot.Id} ({map}) MAP {settings.MapNumber} {settings.Width}x{settings.Height} depth {settings.Depth}.");
+        if (CS2MenuManager.API.Class.MenuManager.GetActiveMenu(player)?.Menu.Title == "MatchZy map slots")
+            plugin.MenuManager!.ShowMapIntegrationMenu(player);
     }
 
     public void Remove(PropModel slot)
