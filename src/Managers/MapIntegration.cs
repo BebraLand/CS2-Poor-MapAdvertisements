@@ -276,6 +276,7 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
     public void Refresh()
     {
         if (!running || string.IsNullOrEmpty(map)) return;
+        if (!plugin.AdvertisementsVisible) { ClearEntities(); return; }
         if (!plugin.Config.MapIntegration.Enabled) { Placing.Clear(); previews.Clear(); }
         foreach (var player in Placing.Concat(previews.Keys).Distinct().ToArray())
             if (!player.IsValid || !AdminManager.PlayerHasPermissions(player, plugin.Config.AdminFlag))

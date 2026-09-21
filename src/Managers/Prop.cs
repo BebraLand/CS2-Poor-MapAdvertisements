@@ -123,6 +123,8 @@ namespace CS2_Poor_MapAdvertisements.Managers
 
         public void SpawnProps()
         {
+            if (!_plugin.AdvertisementsVisible) return;
+
             foreach (var prop in _props)
             {
                 if (prop.EntityProp?.IsValid == true) continue;

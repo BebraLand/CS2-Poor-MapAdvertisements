@@ -69,4 +69,20 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
         }
     }
 
+    public void SetAdvertisementsVisible(bool visible)
+    {
+        if (AdvertisementsVisible == visible) return;
+        AdvertisementsVisible = visible;
+
+        if (!visible)
+        {
+            EventManager?.RemoveAdvertisementEntities();
+            MapIntegration?.ClearEntities();
+            return;
+        }
+
+        PropManager?.SpawnProps();
+        MapIntegration?.Refresh();
+    }
+
 }

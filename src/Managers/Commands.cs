@@ -65,7 +65,7 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
             return;
         }
 
-        _plugin.AdvertisementsVisible = !_plugin.AdvertisementsVisible;
+        _plugin.SetAdvertisementsVisible(!_plugin.AdvertisementsVisible);
         player.PrintToChat($"{_plugin.Localizer["Prefix"]}All advertisements are now {(_plugin.AdvertisementsVisible ? "VISIBLE" : "HIDDEN")}.");
     }
 

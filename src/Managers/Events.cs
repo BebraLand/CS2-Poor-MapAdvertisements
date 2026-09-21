@@ -155,20 +155,27 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         return HookResult.Continue;
     }
 
+    public void RemoveAdvertisementEntities()
+    {
+        foreach (var ad in GetAdvertisementEntities())
+            if (ad.IsValid) ad.Remove();
+    }
+
+    private static IEnumerable<CBaseEntity> GetAdvertisementEntities()
+    {
+        var decals = Utilities.FindAllEntitiesByDesignerName<CEnvDecal>("env_decal") ?? [];
+        var props = Utilities.FindAllEntitiesByDesignerName<CPhysicsPropOverride>("prop_physics_override") ?? [];
+        return decals.Cast<CBaseEntity>().Concat(props)
+            .Where(entity => entity.Entity?.Name?.StartsWith("advert", StringComparison.Ordinal) == true);
+    }
+
     private void OnCheckTransmit(CCheckTransmitInfoList infoList)
     {
         _plugin.MapIntegration!.CheckTransmit(infoList);
-        var decals = Utilities.FindAllEntitiesByDesignerName<CEnvDecal>("env_decal");
-        var props = Utilities.FindAllEntitiesByDesignerName<CPhysicsPropOverride>("prop_physics_override");
-
-        var allAdvs = new List<CBaseEntity>();
-
-        if(decals != null) allAdvs.AddRange(decals);
-        if(props != null) allAdvs.AddRange(props);
+        var allAdvs = GetAdvertisementEntities().ToList();
 
         if(!allAdvs.Any()) return;
 
-        if (allAdvs == null || !allAdvs.Any()) return;
         try
         {
             foreach (var entry in infoList)
