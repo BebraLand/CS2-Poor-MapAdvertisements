@@ -274,10 +274,42 @@ public partial class PluginMenu
         var pawn = player.PlayerPawn.Value;
         if (pawn == null || !pawn.IsValid) return;
 
-        var entity = prop.EntityProp;
-        if (entity == null) return;
-
         WasdMenu menu = new($"{_plugin.Localizer[$"EditDecal_Header"]} #{propId}", _plugin);
+
+        menu.AddItem($"{_plugin.Localizer["DeleteSpecificAdvert"]}", (p, o) =>
+        {
+            WasdMenu confirm = new(_plugin.Localizer["DeleteSpecificAdvertHeader", propId], _plugin)
+            {
+                PrevMenu = menu
+            };
+
+            confirm.AddItem(_plugin.Localizer["DeleteSpecificAdvertConfirm"], (who, option) =>
+            {
+                if (_plugin.PropManager!.RemovePropFromFile(prop.Id))
+                {
+                    who.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["SuccessRemove", propId]}");
+                }
+
+                option.PostSelectAction = PostSelectAction.Close;
+                Server.NextFrame(() => EditDecalMenu(who, (WasdMenu)prevMenu.PrevMenu!));
+            });
+
+            confirm.AddItem(_plugin.Localizer["Cancel"], (who, option) =>
+            {
+                option.PostSelectAction = PostSelectAction.Close;
+                Server.NextFrame(() => EditSpecificDecal(who, menu, prop, propId));
+            });
+
+            confirm.Display(p, 0);
+        });
+
+        var entity = prop.EntityProp;
+        if (entity == null)
+        {
+            menu.PrevMenu = prevMenu;
+            menu.Display(player, 0);
+            return;
+        }
 
         menu.AddItem($"{_plugin.Localizer[$"TeleportToAdv"]}", (p, o) =>
         {
