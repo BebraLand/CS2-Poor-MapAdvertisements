@@ -2,6 +2,7 @@
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Utils;
+using Microsoft.Extensions.Logging;
 
 namespace CS2_Poor_MapAdvertisements.Managers;
 
@@ -58,15 +59,18 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
 
     private void OnToggleAdvertisements(CCSPlayerController? player, CommandInfo commandInfo)
     {
-        if (player == null || !AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag))
+        if (player != null && !AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag))
         {
-            if (player != null)
-                player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["NoAccess"]}");
+            player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["NoAccess"]}");
             return;
         }
 
         _plugin.SetAdvertisementsVisible(!_plugin.AdvertisementsVisible);
-        player.PrintToChat($"{_plugin.Localizer["Prefix"]}All advertisements are now {(_plugin.AdvertisementsVisible ? "VISIBLE" : "HIDDEN")}.");
+        var state = _plugin.AdvertisementsVisible ? "VISIBLE" : "HIDDEN";
+        if (player != null)
+            player.PrintToChat($"{_plugin.Localizer["Prefix"]}All advertisements are now {state}.");
+        else
+            _plugin.Logger.LogInformation("All advertisements are now {State}.", state);
     }
 
 }
