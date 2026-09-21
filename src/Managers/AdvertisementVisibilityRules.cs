@@ -1,8 +1,32 @@
 namespace CS2_Poor_MapAdvertisements.Managers;
 
+public enum AdvertisementAudience
+{
+    Everyone,
+    Spectators
+}
+
+public enum AdvertisementPreference
+{
+    Auto,
+    Hidden,
+    Visible
+}
+
 public static class AdvertisementVisibilityRules
 {
-    public static bool ShouldHide(bool advertisementsVisible, bool isVip, string? entityName)
+    public static bool ShouldHide(
+        bool advertisementsVisible,
+        AdvertisementAudience audience,
+        AdvertisementPreference preference,
+        bool isActivePlayer,
+        bool isVip,
+        string? entityName)
         => entityName?.StartsWith("advert", StringComparison.Ordinal) == true
-            && (!advertisementsVisible || (isVip && entityName.Contains("force", StringComparison.Ordinal)));
+            && (!advertisementsVisible
+                || (isVip && entityName.Contains("force", StringComparison.Ordinal))
+                || preference == AdvertisementPreference.Hidden
+                || (preference == AdvertisementPreference.Auto
+                    && audience == AdvertisementAudience.Spectators
+                    && isActivePlayer));
 }

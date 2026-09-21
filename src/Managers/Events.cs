@@ -194,9 +194,17 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
 
                 if (player == null) continue;
                 bool isVip = AdminManager.PlayerHasPermissions(player, _plugin.Config.VipFlag);
+                bool isActivePlayer = player.Team is CsTeam.Terrorist or CsTeam.CounterTerrorist;
+                var preference = _plugin.GetAdvertisementPreference(player);
                 foreach (var ad in allAdvs)
                 {
-                    if (AdvertisementVisibilityRules.ShouldHide(_plugin.AdvertisementsVisible, isVip, ad.Entity?.Name))
+                    if (AdvertisementVisibilityRules.ShouldHide(
+                        _plugin.AdvertisementsVisible,
+                        _plugin.AdvertisementAudience,
+                        preference,
+                        isActivePlayer,
+                        isVip,
+                        ad.Entity?.Name))
                         info.TransmitEntities.Remove(ad);
                 }
             }

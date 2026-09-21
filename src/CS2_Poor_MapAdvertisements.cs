@@ -24,6 +24,8 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
     public PropManager? PropManager { get; private set; }
     public MapIntegration? MapIntegration { get; private set; }
     public bool AdvertisementsVisible { get; set; } = true;
+    public AdvertisementAudience AdvertisementAudience { get; set; } = AdvertisementAudience.Everyone;
+    public Dictionary<ulong, AdvertisementPreference> AdvertisementPreferences { get; } = [];
 
     public PluginUtils? PluginUtils { get; private set; }
     public CommandsManager? CommandsManager { get; private set; }
@@ -83,6 +85,24 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
 
         PropManager?.SpawnProps();
         MapIntegration?.Refresh();
+    }
+
+    public AdvertisementPreference GetAdvertisementPreference(CCSPlayerController player)
+        => AdvertisementPreferences.GetValueOrDefault(player.SteamID, AdvertisementPreference.Auto);
+
+    public void RefreshAdvertisementVisibility()
+    {
+        if (!AdvertisementsVisible) return;
+
+        EventManager?.RemoveAdvertisementEntities();
+        MapIntegration?.ClearEntities();
+        CounterStrikeSharp.API.Server.NextFrame(() =>
+            CounterStrikeSharp.API.Server.NextFrame(() =>
+            {
+                if (!AdvertisementsVisible) return;
+                PropManager?.SpawnProps();
+                MapIntegration?.Refresh();
+            }));
     }
 
 }
