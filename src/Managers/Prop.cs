@@ -125,6 +125,8 @@ namespace CS2_Poor_MapAdvertisements.Managers
         {
             foreach (var prop in _props)
             {
+                if (prop.EntityProp?.IsValid == true) continue;
+
                 if (_plugin.PluginUtils!.CheckMaterial(prop.modelPath!))
                 {
                     var ent = _plugin.PluginUtils!.CreatePropModel(new Vector(prop.posX, prop.posY, prop.posZ), new QAngle(prop.angleX, prop.angleY, prop.angleZ), prop.modelPath!, prop.forceOnVip, prop.isOnGround ? true : false, prop.ModelGroupIndex, prop.Id);

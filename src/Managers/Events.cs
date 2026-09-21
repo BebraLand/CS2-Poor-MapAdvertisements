@@ -220,6 +220,7 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
             Server.NextFrame(() =>
             {
                 _plugin.PropManager.LoadPropsFromMap();
+                _plugin.PropManager.SpawnProps();
             });
         });
     }
