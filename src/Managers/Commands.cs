@@ -20,6 +20,7 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
                     _plugin.MenuManager!.ShowMapIntegrationMenu(player);
             });
             _plugin.AddCommand("css_mapadverts_undo", "Undo last map advert placement", OnUndoLastAdvert);
+            _plugin.AddCommand("css_mapadverts_toggle", "Emergency advertisement visibility toggle", OnToggleAdvertisements);
         }
     }
     private void OnMapAdvert(CCSPlayerController? player, CommandInfo commandInfo)
@@ -53,6 +54,19 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
 
         var removedId = _plugin.PropManager!.UndoLastPlacement();
         player.PrintToChat($"{_plugin.Localizer["Prefix"]}{(removedId.HasValue ? _plugin.Localizer["SuccessUndo", removedId.Value] : _plugin.Localizer["NothingToUndo"])}");
+    }
+
+    private void OnToggleAdvertisements(CCSPlayerController? player, CommandInfo commandInfo)
+    {
+        if (player == null || !AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag))
+        {
+            if (player != null)
+                player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["NoAccess"]}");
+            return;
+        }
+
+        _plugin.AdvertisementsVisible = !_plugin.AdvertisementsVisible;
+        player.PrintToChat($"{_plugin.Localizer["Prefix"]}All advertisements are now {(_plugin.AdvertisementsVisible ? "VISIBLE" : "HIDDEN")}.");
     }
 
 }

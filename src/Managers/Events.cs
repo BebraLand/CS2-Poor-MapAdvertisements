@@ -186,17 +186,11 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
                 }
 
                 if (player == null) continue;
-
-                if (AdminManager.PlayerHasPermissions(player, _plugin.Config.VipFlag))
+                bool isVip = AdminManager.PlayerHasPermissions(player, _plugin.Config.VipFlag);
+                foreach (var ad in allAdvs)
                 {
-                    foreach (var ad in allAdvs)
-                    {
-                        if (ad.Entity!.Name == null) continue;
-                        if (ad!.Entity!.Name.StartsWith("advert") && ad!.Entity!.Name.Contains("force"))
-                        {
-                            info.TransmitEntities.Remove(ad);
-                        }
-                    }
+                    if (AdvertisementVisibilityRules.ShouldHide(_plugin.AdvertisementsVisible, isVip, ad.Entity?.Name))
+                        info.TransmitEntities.Remove(ad);
                 }
             }
         }

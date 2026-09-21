@@ -23,6 +23,7 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
     public EventManager? EventManager { get; private set; }
     public PropManager? PropManager { get; private set; }
     public MapIntegration? MapIntegration { get; private set; }
+    public bool AdvertisementsVisible { get; set; } = true;
 
     public PluginUtils? PluginUtils { get; private set; }
     public CommandsManager? CommandsManager { get; private set; }
