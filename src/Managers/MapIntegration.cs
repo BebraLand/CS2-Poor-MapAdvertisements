@@ -25,6 +25,8 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
     private string SlotPath => Path.Combine(Root, plugin.ModuleName, "map-integration", Path.GetFileName(map) + ".json");
     private static readonly PluginCapability<int> CurrentMapNumberCapability =
         new("matchzy:current_map_number:v1");
+    private static readonly PluginCapability<int> SeriesLengthCapability =
+        new("matchzy:series_length:v1");
     public int CurrentMapNumber { get; private set; }
     public bool IsPlacing => Placing.Any();
     public bool HasUndo => undo.Any(Slots.Contains);
@@ -278,7 +280,11 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
             { Placing.Remove(player); previews.Remove(player); }
         CurrentMapNumber = 0;
         if (plugin.Config.MapIntegration.Enabled)
+        {
             CurrentMapNumber = ReadCurrentMapNumber();
+            if (!MapIntegrationRules.ShouldShowSeries(ReadSeriesLength(), plugin.Config.MapIntegration.ShowInBestOfOne))
+                CurrentMapNumber = 0;
+        }
         int number = CurrentMapNumber > 0 ? CurrentMapNumber : previews.Values.LastOrDefault();
         var material = plugin.Config.MapIntegration.Enabled ? Material(number) : null;
         if (material != renderedMaterial) { ClearEntities(); renderedMaterial = material; }
@@ -294,6 +300,12 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
     private int ReadCurrentMapNumber()
     {
         try { return CurrentMapNumberCapability.Get(); }
+        catch (KeyNotFoundException) { return 0; }
+    }
+
+    private int ReadSeriesLength()
+    {
+        try { return SeriesLengthCapability.Get(); }
         catch (KeyNotFoundException) { return 0; }
     }
 

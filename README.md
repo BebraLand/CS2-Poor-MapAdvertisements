@@ -57,7 +57,8 @@ this plugin reads the current series map from MatchZy's CounterStrikeSharp
 capability and selects one of up to five configured materials.
 
 Configure `MatchZy Map Integration` with `Enabled: true` and up to five valid
-`materials/.../*.vmat` paths, then reload the map. Open `css_mapadverts_matchzy`,
+`materials/.../*.vmat` paths. Set `Show In Best Of One` to `false` to hide only
+the map-dependent slots in BO1, then reload the map. Open `css_mapadverts_matchzy`,
 choose a preview material and the
 new slot's width, height and depth, then enable ping placement. Each ping saves
 one slot for the current map; position and rotation can be edited later.

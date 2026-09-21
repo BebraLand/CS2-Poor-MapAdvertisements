@@ -35,6 +35,8 @@ namespace CS2_Poor_MapAdvertisements.Config
     public class MapIntegrationConfig
     {
         public bool Enabled { get; set; } = false;
+        [JsonPropertyName("Show In Best Of One")]
+        public bool ShowInBestOfOne { get; set; } = true;
         public string[] Materials { get; set; } = [];
     }
 }

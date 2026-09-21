@@ -1,4 +1,5 @@
 using MatchZy;
+using CS2_Poor_MapAdvertisements.Managers;
 
 int checks = 0;
 void Check(bool condition, string name)
@@ -20,4 +21,8 @@ Check(MapAdvertisementRules.Select(false, 1, 3, ["de_mirage", "de_mirage", "de_m
 Check(MapAdvertisementRules.Select(true, 1, 3, ["de_mirage"], "de_mirage") == 0, "Incomplete veto list");
 Check(MapAdvertisementRules.Select(true, 0, 1, ["workshop/123/de_mirage"], "de_mirage") == 1, "Workshop map path");
 Check(MapAdvertisementRules.Select(true, 0, 1, ["12345678"], "custom_map") == 1, "Workshop numeric ID after transition");
+Check(MapIntegrationRules.ShouldShowSeries(1, true), "BO1 enabled");
+Check(!MapIntegrationRules.ShouldShowSeries(1, false), "BO1 disabled");
+Check(MapIntegrationRules.ShouldShowSeries(3, false), "BO3 unaffected");
+Check(MapIntegrationRules.ShouldShowSeries(0, false), "Older MatchZy fails open");
 Console.WriteLine($"PASS: {checks} Map Integration checks.");
