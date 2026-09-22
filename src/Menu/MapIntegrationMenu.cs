@@ -101,7 +101,7 @@ public partial class PluginMenu
             {
                 if (!player.IsValid) return;
                 if (slot != null && _plugin.MapIntegration!.Slots.Contains(slot))
-                    EditIntegrationSlot(player, null, slot);
+                    menu.Display(player, 0);
                 else ShowMapIntegrationMenu(player);
             });
         });
