@@ -219,19 +219,8 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
 
     private void OnMapStart(string mapName)
     {
-        _plugin.PropManager!._props.Clear();
-        Server.NextFrame(() =>
-        {
-            _plugin.PropManager._mapName = mapName;
-            _plugin.PropManager!.SetMapFilePath(mapName);
-
-            _plugin.PropManager.GenerateJsonFile();
-            Server.NextFrame(() =>
-            {
-                _plugin.PropManager.LoadPropsFromMap();
-                _plugin.PropManager.SpawnProps();
-            });
-        });
+        _plugin.PropManager!.InitializeMap(mapName);
+        Server.NextFrame(() => _plugin.PropManager.SpawnProps());
     }
 
 }

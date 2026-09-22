@@ -45,6 +45,8 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
         MapIntegration.Start();
 
         PropManager.MigrateLegacyMapFiles();
+        if (!string.IsNullOrWhiteSpace(CounterStrikeSharp.API.Server.MapName))
+            PropManager.InitializeMap(CounterStrikeSharp.API.Server.MapName);
 
         EventManager.RegisterEvents();
         CommandsManager.RegisterCommands();

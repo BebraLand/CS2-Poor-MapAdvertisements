@@ -46,12 +46,24 @@ namespace CS2_Poor_MapAdvertisements.Managers
             }
         }
 
-        public void SetMapFilePath(string mapName)
+        private void SetMapFilePath(string mapName)
         {
             _mapFilePath = Path.Combine(MapStorageDirectory, $"{Path.GetFileName(mapName)}.json");
         }
 
-        public void GenerateJsonFile()
+        public void InitializeMap(string mapName)
+        {
+            if (string.IsNullOrWhiteSpace(mapName)) return;
+
+            _props.Clear();
+            _undoHistory.Clear();
+            _mapName = mapName;
+            SetMapFilePath(mapName);
+            GenerateJsonFile();
+            LoadPropsFromMap();
+        }
+
+        private void GenerateJsonFile()
         {
             string directoryPath = Path.GetDirectoryName(_mapFilePath!)!;
             try
@@ -76,6 +88,8 @@ namespace CS2_Poor_MapAdvertisements.Managers
             lock (_fileLock)
             {
                 if (pos == null || angle == null) return null;
+                if (string.IsNullOrWhiteSpace(_mapFilePath))
+                    throw new InvalidOperationException("Map advertisement storage is not initialized yet.");
                 int newId = _props.Count();
 
                 var model = new PropModel
@@ -105,7 +119,7 @@ namespace CS2_Poor_MapAdvertisements.Managers
             }
         }
 
-        public void LoadPropsFromMap()
+        private void LoadPropsFromMap()
         {
             _undoHistory.Clear();
             if (File.Exists(_mapFilePath))
