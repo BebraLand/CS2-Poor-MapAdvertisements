@@ -71,9 +71,15 @@ their storage are unchanged.
 Tried to make plugin idiot proof (since I did a lot of mistakes).
 | Command  | Description |
 | ------------- | ------------- |
-| css_mapadverts | Menu that allows to setup advertisements |
-| css_mapadverts_matchzy | Optional MatchZy map-slot setup |
-| css_mapadverts_undo | Removes the last advert placed since the current map load |
+| `css_mapadverts` / `!mapadverts` | Opens the main advertisement menu for creating, editing, deleting and saving ordinary decals and props. Admin flag required. |
+| `css_mapadverts_matchzy` / `!mapadverts_matchzy` | Opens the MatchZy map-slot editor for map-dependent MAP 1–5 decals. Admin flag required. |
+| `css_mapadverts_edit_nearest` / `!mapadverts_edit_nearest` | Opens the editor for the closest saved ordinary decal, including position, rotation, size and deletion. Admin flag required. |
+| `css_mapadverts_undo` / `!mapadverts_undo` | Removes the last ordinary advert placement made since the current map load. Admin flag required. |
+| `css_mapadverts_toggle` / `!mapadverts_toggle` | Emergency global visibility switch. Hides or shows all advertisements immediately for everyone. Admin flag or server console. |
+| `css_mapadverts_audience <all\|spectators>` / `!mapadverts_audience <all\|spectators>` | Chooses whether advertisements are visible to everyone or only spectators. The change is applied in real time. Admin flag or server console. `everyone` and `observers` are accepted aliases. |
+| `css_mapadverts_self <auto\|hide\|show>` / `!mapadverts_self <auto\|hide\|show>` | Sets the current player's personal visibility preference. `auto` follows the global settings, `hide` hides advertisements for that player, and `show` keeps them visible when the global switch is enabled. Available to every player. |
+
+All commands are disabled when `Enable commands` is set to `false`. The global emergency switch always overrides personal visibility preferences.
 
 While “Spawn on Ping” is enabled, the plugin temporarily sets the server's `player_ping_token_cooldown` to `0`, then restores its previous value once no admin is placing adverts via ping. This is a global server setting for that short setup period.
 
