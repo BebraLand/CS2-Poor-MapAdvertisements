@@ -24,6 +24,7 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
             _plugin.AddCommand("css_mapadverts_toggle", "Emergency advertisement visibility toggle", OnToggleAdvertisements);
             _plugin.AddCommand("css_mapadverts_audience", "Set advertisement audience: all or spectators", OnSetAdvertisementAudience);
             _plugin.AddCommand("css_mapadverts_self", "Set your personal advertisement visibility", OnTogglePersonalVisibility);
+            _plugin.AddCommand("css_mapadverts_edit_nearest", "Edit the nearest decal", OnEditNearestDecal);
         }
     }
     private void OnMapAdvert(CCSPlayerController? player, CommandInfo commandInfo)
@@ -73,6 +74,18 @@ public class CommandsManager(CS2_Poor_MapAdvertisements plugin)
             player.PrintToChat($"{_plugin.Localizer["Prefix"]}All advertisements are now {state}.");
         else
             _plugin.Logger.LogInformation("All advertisements are now {State}.", state);
+    }
+
+    private void OnEditNearestDecal(CCSPlayerController? player, CommandInfo commandInfo)
+    {
+        if (player == null) return;
+        if (!AdminManager.PlayerHasPermissions(player, _plugin.Config.AdminFlag))
+        {
+            player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["NoAccess"]}");
+            return;
+        }
+
+        _plugin.MenuManager!.EditNearestDecal(player);
     }
 
     private void OnSetAdvertisementAudience(CCSPlayerController? player, CommandInfo commandInfo)

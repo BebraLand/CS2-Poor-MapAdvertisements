@@ -10,6 +10,34 @@ namespace CS2_Poor_MapAdvertisements.Menu;
 
 public partial class PluginMenu
 {
+    public void EditNearestDecal(CCSPlayerController player)
+    {
+        var pawn = player.PlayerPawn.Value;
+        var origin = pawn?.AbsOrigin;
+        if (pawn == null || !pawn.IsValid || origin == null) return;
+
+        var nearest = _plugin.PropManager!._props
+            .Where(prop => !string.IsNullOrWhiteSpace(prop.modelPath) && !_plugin.PluginUtils!.CheckMaterial(prop.modelPath))
+            .OrderBy(prop => DistanceSquared(prop, origin))
+            .FirstOrDefault();
+
+        if (nearest == null)
+        {
+            player.PrintToChat($"{_plugin.Localizer["Prefix"]}No decals found.");
+            return;
+        }
+
+        EditSpecificDecal(player, null, nearest, nearest.Id);
+    }
+
+    private static double DistanceSquared(PropModel prop, Vector origin)
+    {
+        var dx = prop.posX - origin.X;
+        var dy = prop.posY - origin.Y;
+        var dz = prop.posZ - origin.Z;
+        return dx * dx + dy * dy + dz * dz;
+    }
+
     // Decal menus:
     public void CreateDecalMenu(CCSPlayerController player, WasdMenu? prevMenu)
     {
@@ -268,7 +296,7 @@ public partial class PluginMenu
         menu.Display(player, 0);
     }
 
-    private void EditSpecificDecal(CCSPlayerController player, WasdMenu prevMenu, PropModel prop, int propId)
+    private void EditSpecificDecal(CCSPlayerController player, WasdMenu? prevMenu, PropModel prop, int propId)
     {
         if (player == null) return;
         var pawn = player.PlayerPawn.Value;
@@ -291,7 +319,13 @@ public partial class PluginMenu
                 }
 
                 option.PostSelectAction = PostSelectAction.Close;
-                Server.NextFrame(() => EditDecalMenu(who, (WasdMenu)prevMenu.PrevMenu!));
+                Server.NextFrame(() =>
+                {
+                    if (prevMenu?.PrevMenu is WasdMenu parent)
+                        EditDecalMenu(who, parent);
+                    else
+                        ShowMapAdvertMenu(who);
+                });
             });
 
             confirm.AddItem(_plugin.Localizer["Cancel"], (who, option) =>
@@ -306,10 +340,15 @@ public partial class PluginMenu
         var entity = prop.EntityProp;
         if (entity == null)
         {
+            if (prevMenu == null)
+                menu.AddItem("Back to Map advertisements", (p, _) => ShowMapAdvertMenu(p));
             menu.PrevMenu = prevMenu;
             menu.Display(player, 0);
             return;
         }
+
+        if (prevMenu == null)
+            menu.AddItem("Back to Map advertisements", (p, _) => ShowMapAdvertMenu(p));
 
         menu.AddItem($"{_plugin.Localizer[$"TeleportToAdv"]}", (p, o) =>
         {
@@ -330,7 +369,7 @@ public partial class PluginMenu
 
     Server.NextFrame(() =>
     {
-        EditSpecificProp(player, prevMenu, prop, propId);
+        EditSpecificDecal(player, prevMenu, prop, propId);
     });
 });
 
@@ -378,7 +417,10 @@ public partial class PluginMenu
             player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer[$"SavedProp", prop.Id]}");
             Server.NextFrame(() =>
             {
-                EditDecalMenu(player, (WasdMenu)prevMenu.PrevMenu!);
+                if (prevMenu?.PrevMenu is WasdMenu parent)
+                    EditDecalMenu(player, parent);
+                else
+                    ShowMapAdvertMenu(player);
             });
         });
 
