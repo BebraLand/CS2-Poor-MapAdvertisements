@@ -230,7 +230,7 @@ public partial class PluginMenu
         if (player == null) return;
         WasdMenu menu = new($"{_plugin.Localizer["DecalDepth_Header", _selectedMaterial[player].depth]}", _plugin);
 
-        menu.AddItem($"{_plugin.Localizer["DecalDepth_Item"]}", (p, o) =>
+        menu.AddItem($"{_plugin.Localizer["DecalDepth_ItemPlus"]}", (p, o) =>
         {
             _selectedMaterial[player].depth++;
             o.PostSelectAction = PostSelectAction.Reset;
@@ -241,7 +241,7 @@ public partial class PluginMenu
             });
         });
 
-        menu.AddItem("-1 to depth", (p, o) =>
+        menu.AddItem($"{_plugin.Localizer["DecalDepth_ItemMinus"]}", (p, o) =>
         {
             _selectedMaterial[player].depth--;
             o.PostSelectAction = PostSelectAction.Reset;
@@ -260,7 +260,7 @@ public partial class PluginMenu
     private void EditDepth(CCSPlayerController player, WasdMenu prevMenu, PropModel prop)
     {
         if (player == null) return;
-        WasdMenu menu = new($"{_plugin.Localizer["DecalDepth_Header", _selectedMaterial[player].depth]}", _plugin);
+        WasdMenu menu = new($"{_plugin.Localizer["DecalDepth_Header", prop.depth]}", _plugin);
 
         menu.AddItem($"{_plugin.Localizer["DecalDepth_ItemPlus"]}", (p, o) =>
         {

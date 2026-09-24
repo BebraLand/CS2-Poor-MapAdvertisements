@@ -139,6 +139,8 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
                 Placing.Remove(player);
                 previews.Remove(player);
                 placementSettings.Remove(player);
+                plugin.MenuManager!._selectedMaterial.Remove(player);
+                plugin.MenuManager._listenForChat.Remove(player);
             }
             return HookResult.Continue;
         });

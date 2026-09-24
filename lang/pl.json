@@ -40,7 +40,7 @@
 	"SelectFirst_Height": "Najpierw wybierz wysokosc",
 	"Decal_Depth": "Glebokosc: {0}",
 	"DecalDepth_Header": "Glebokosc: {0}",
-	"DecalDepth_Item": "+1 do glebokosci",
+	"DecalDepth_ItemPlus": "+1 do glebokosci",
 	"DecalDepth_ItemMinus": "-1 do glebokosci",
 	"TeleportToAdv": "Teleportuj",
 	"VipOnly": "Vip: {0}",

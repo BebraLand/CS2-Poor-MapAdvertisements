@@ -45,7 +45,7 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
                 player.PrintToCenterHtml("Map Integration: ping a wall to save a slot.<br>Stop: !mapadverts_matchzy");
         foreach(var player in _plugin.MenuManager!._selectedMaterial)
         {
-            if(player.Value.onPing)
+            if(player.Key.IsValid && player.Value.onPing)
             {
                 placingViaPing = true;
                 player.Key.PrintToCenterHtml($"{_plugin.Localizer["OnTickNotification", player.Value.material!]}");

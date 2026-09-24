@@ -95,7 +95,7 @@ public partial class PluginMenu
     }
 
     // Guard callbacks too: permission/config/map may change while a menu is open.
-    private void AddIntegrationAction(WasdMenu menu, string label, Action action, PropModel? slot = null)
+    private void AddIntegrationAction(WasdMenu menu, string label, Action action, PropModel? slot = null, Action<CCSPlayerController>? refresh = null)
     {
         menu.AddItem(label, (player, option) =>
         {
@@ -112,7 +112,10 @@ public partial class PluginMenu
             {
                 if (!player.IsValid) return;
                 if (slot != null && _plugin.MapIntegration!.Slots.Contains(slot))
-                    menu.Display(player, 0);
+                {
+                    if (refresh != null) refresh(player);
+                    else menu.Display(player, 0);
+                }
                 else ShowMapIntegrationMenu(player);
             });
         });
@@ -137,7 +140,8 @@ public partial class PluginMenu
             sizes.Display(p, 0);
         });
         AddIntegrationAction(menu, $"Blend: {(slot.solid ? "Solid" : "Current")}",
-            () => ChangeSlot(slot, () => slot.solid = !slot.solid), slot);
+            () => ChangeSlot(slot, () => slot.solid = !slot.solid), slot,
+            p => EditIntegrationSlot(p, previous, slot));
         menu.AddItem($"Opacity: {slot.opacity}%", (p, _) =>
         {
             var opacity = new WasdMenu($"Slot opacity: {slot.opacity}%", _plugin) { PrevMenu = menu };
