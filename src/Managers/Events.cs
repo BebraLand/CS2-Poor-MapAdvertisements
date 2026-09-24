@@ -23,6 +23,7 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         {
             foreach (var material in (_plugin.Config.Props ?? [])
                 .Concat(_plugin.Config.MapIntegration?.Materials ?? [])
+                .Concat(_plugin.Config.SolidMaterialVariants.Values)
                 .Where(path => !string.IsNullOrWhiteSpace(path))
                 .Distinct(StringComparer.OrdinalIgnoreCase))
             {

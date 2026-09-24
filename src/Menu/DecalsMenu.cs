@@ -3,6 +3,7 @@ using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CS2_Poor_MapAdvertisements.Models;
+using CS2MenuManager.API.Class;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Menu;
 
@@ -56,7 +57,8 @@ public partial class PluginMenu
                 materialIndex = 0,
                 width = 0,
                 height = 0,
-                depth = 14
+                depth = 14,
+                opacity = 100
             };
             _selectedMaterial[player] = data;
         }
@@ -93,6 +95,15 @@ public partial class PluginMenu
             {
                 DecalsDepthMenu(player, menu);
             });
+
+        menu.AddItem($"Blend: {(data.solid ? "Solid" : "Current")}", (p, o) =>
+        {
+            data.solid = !data.solid;
+            o.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => CreateDecalMenu(p, prevMenu));
+        }, disableOption: HasSolidVariant(data.material) ? DisableOption.None : DisableOption.DisableHideNumber);
+
+        menu.AddItem($"Opacity: {data.opacity}%", (p, o) => CreateOpacityMenu(p, menu, data));
 
         menu.AddItem($"{_plugin.Localizer["VipOnly", data.isVip]}", (p, o) =>
         {
@@ -154,6 +165,7 @@ public partial class PluginMenu
                     {
                         _selectedMaterial[player].material = material;
                     }
+                    if (!HasSolidVariant(material)) _selectedMaterial[player].solid = false;
                     o.PostSelectAction = PostSelectAction.Close;
 
                     Server.NextFrame(() =>
@@ -164,6 +176,27 @@ public partial class PluginMenu
             }
         }
         menu.PrevMenu = prevMenu;
+        menu.Display(player, 0);
+    }
+
+    private bool HasSolidVariant(string? material)
+        => material != null && _plugin.Config.SolidMaterialVariants.ContainsKey(material);
+
+    private void CreateOpacityMenu(CCSPlayerController player, WasdMenu previous, SelectedMaterialModel selected)
+    {
+        var menu = new WasdMenu($"Opacity: {selected.opacity}%", _plugin) { PrevMenu = previous };
+        menu.AddItem("+10%", (p, o) =>
+        {
+            selected.opacity = Math.Min(100, selected.opacity + 10);
+            o.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => CreateOpacityMenu(p, previous, selected));
+        });
+        menu.AddItem("-10%", (p, o) =>
+        {
+            selected.opacity = Math.Max(10, selected.opacity - 10);
+            o.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => CreateOpacityMenu(p, previous, selected));
+        });
         menu.Display(player, 0);
     }
 
@@ -246,7 +279,7 @@ public partial class PluginMenu
 
             oldDecal.Remove();
 
-            var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, width, height, prop.forceOnVip, prop.depth);
+            var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, width, height, prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
             prop.EntityProp = newProp;
 
             o.PostSelectAction = PostSelectAction.Nothing;
@@ -269,7 +302,7 @@ public partial class PluginMenu
 
             oldDecal.Remove();
 
-            var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, width, height, prop.forceOnVip, prop.depth);
+            var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, width, height, prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
             prop.EntityProp = newProp;
 
             o.PostSelectAction = PostSelectAction.Nothing;
@@ -373,6 +406,16 @@ public partial class PluginMenu
     });
 });
 
+        menu.AddItem($"Blend: {(prop.solid ? "Solid" : "Current")}", (p, o) =>
+        {
+            prop.solid = !prop.solid;
+            RespawnDecal(prop);
+            o.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => EditSpecificDecal(p, prevMenu, prop, propId));
+        }, disableOption: HasSolidVariant(prop.modelPath) ? DisableOption.None : DisableOption.DisableHideNumber);
+
+        menu.AddItem($"Opacity: {prop.opacity}%", (p, o) => EditOpacityMenu(p, menu, prop, propId));
+
         menu.AddItem($"{_plugin.Localizer[$"ChooseMaterial"]}", (p, o) =>
         {
             DecalMaterialEdit(player, menu, prop, propId);
@@ -453,7 +496,7 @@ public partial class PluginMenu
 
                     oldDecal.Remove();
 
-                    var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, i, height, prop.forceOnVip, prop.depth);
+                    var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, i, height, prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
                     prop.EntityProp = newProp;
 
                     prop.width = i;
@@ -482,7 +525,7 @@ public partial class PluginMenu
 
                     prop.height = i;
 
-                    var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, width, i, prop.forceOnVip, prop.depth);
+                    var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, prop.modelPath!, width, i, prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
                     prop.EntityProp = newProp;
                     o.PostSelectAction = PostSelectAction.Nothing;
                     Server.NextFrame(() =>
@@ -520,8 +563,9 @@ public partial class PluginMenu
                     oldDecal.Remove();
 
                     prop.modelPath = material;
+                    if (!HasSolidVariant(material)) prop.solid = false;
 
-                    var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, material, width, height, prop.forceOnVip, prop.depth);
+                    var newProp = _plugin.PluginUtils!.CreateDecal(pos!, angle!, material, width, height, prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
                     prop.EntityProp = newProp;
                     o.PostSelectAction = PostSelectAction.Nothing;
                     Server.NextFrame(() =>
@@ -533,6 +577,33 @@ public partial class PluginMenu
         }
         menu.PrevMenu = prevMenu;
         menu.Display(player, 0);
+    }
+
+    private void EditOpacityMenu(CCSPlayerController player, WasdMenu previous, PropModel prop, int propId)
+    {
+        var menu = new WasdMenu($"Opacity: {prop.opacity}%", _plugin) { PrevMenu = previous };
+        menu.AddItem("+10%", (p, o) => ChangeOpacity(p, o, menu, previous, prop, propId, 10));
+        menu.AddItem("-10%", (p, o) => ChangeOpacity(p, o, menu, previous, prop, propId, -10));
+        menu.Display(player, 0);
+    }
+
+    private void ChangeOpacity(CCSPlayerController player, ItemOption option, WasdMenu menu, WasdMenu previous, PropModel prop, int propId, int delta)
+    {
+        prop.opacity = Math.Clamp(prop.opacity + delta, 10, 100);
+        RespawnDecal(prop);
+        option.PostSelectAction = PostSelectAction.Close;
+        Server.NextFrame(() => EditOpacityMenu(player, previous, prop, propId));
+    }
+
+    private void RespawnDecal(PropModel prop)
+    {
+        var old = prop.EntityProp?.As<CEnvDecal>();
+        var position = old?.AbsOrigin;
+        var angle = old?.AbsRotation;
+        if (old == null || position == null || angle == null) return;
+        old.Remove();
+        prop.EntityProp = _plugin.PluginUtils!.CreateDecal(position, angle, prop.modelPath!, prop.width, prop.height,
+            prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
     }
 
 

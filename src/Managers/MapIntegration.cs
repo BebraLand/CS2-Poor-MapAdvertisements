@@ -37,6 +37,8 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
         public float Width { get; set; }
         public float Height { get; set; }
         public int Depth { get; set; } = 14;
+        public bool Solid { get; set; }
+        public int Opacity { get; set; } = 100;
     }
 
     private PlacementSettings Settings(CCSPlayerController player)
@@ -44,10 +46,10 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
             ? settings
             : placementSettings[player] = new();
 
-    public (int MapNumber, float Width, float Height, int Depth) GetPlacementSettings(CCSPlayerController player)
+    public (int MapNumber, float Width, float Height, int Depth, bool Solid, int Opacity) GetPlacementSettings(CCSPlayerController player)
     {
         var settings = Settings(player);
-        return (settings.MapNumber, settings.Width, settings.Height, settings.Depth);
+        return (settings.MapNumber, settings.Width, settings.Height, settings.Depth, settings.Solid, settings.Opacity);
     }
 
     public void SetPlacementMap(CCSPlayerController player, int number)
@@ -78,6 +80,23 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
         ClearEntities();
         Refresh();
     }
+
+    public void SetPlacementSolid(CCSPlayerController player, bool solid)
+    {
+        Settings(player).Solid = solid;
+        ClearEntities();
+        Refresh();
+    }
+
+    public void SetPlacementOpacity(CCSPlayerController player, int opacity)
+    {
+        Settings(player).Opacity = DecalAppearanceRules.NormalizeOpacity(opacity);
+        ClearEntities();
+        Refresh();
+    }
+
+    public bool HasSolidVariant(int number)
+        => Material(number) is { } material && plugin.Config.SolidMaterialVariants.ContainsKey(material);
 
     public string? Material(int number)
     {
@@ -156,7 +175,7 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
 
     private static bool Valid(PropModel s) => new[] { s.posX, s.posY, s.posZ, s.angleX, s.angleY, s.angleZ,
         s.width, s.height }.All(float.IsFinite) && s.width is > 0 and <= 4096 && s.height is > 0 and <= 4096
-        && s.depth is > 0 and <= 256;
+        && s.depth is > 0 and <= 256 && s.opacity is >= 10 and <= 100;
 
     public void Save()
     {
@@ -179,14 +198,15 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
             Id = Slots.Count == 0 ? 1 : Slots.Max(s => s.Id) + 1,
             posX = offset.X, posY = offset.Y, posZ = offset.Z + (ground ? 1 : 0),
             angleX = ground ? 0 : 90, angleY = (pawn.EyeAngles.Y + 180) % 360,
-            width = settings.Width, height = settings.Height, depth = settings.Depth
+            width = settings.Width, height = settings.Height, depth = settings.Depth,
+            solid = settings.Solid, opacity = settings.Opacity
         };
         Slots.Add(slot);
         try { Save(); }
         catch { Slots.Remove(slot); throw; }
         undo.Push(slot);
         Refresh();
-        player.PrintToChat($"[Map Integration] Saved slot #{slot.Id} ({map}) MAP {settings.MapNumber} {settings.Width}x{settings.Height} depth {settings.Depth}.");
+        player.PrintToChat($"[Map Integration] Saved slot #{slot.Id} ({map}) MAP {settings.MapNumber} {settings.Width}x{settings.Height} depth {settings.Depth}, {(settings.Solid ? "solid" : "current")}, opacity {settings.Opacity}%.");
         if (CS2MenuManager.API.Class.MenuManager.GetActiveMenu(player)?.Menu.Title == "MatchZy map slots")
             plugin.MenuManager!.ShowMapIntegrationMenu(player);
     }
@@ -296,7 +316,7 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
         {
             if (slot.EntityProp?.IsValid == true) continue;
             slot.EntityProp = plugin.PluginUtils!.CreateDecal(new Vector(slot.posX, slot.posY, slot.posZ),
-                new QAngle(slot.angleX, slot.angleY, slot.angleZ), material, slot.width, slot.height, false, slot.depth);
+                new QAngle(slot.angleX, slot.angleY, slot.angleZ), material, slot.width, slot.height, false, slot.depth, slot.opacity, slot.solid);
         }
     }
 

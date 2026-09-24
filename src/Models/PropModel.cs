@@ -19,6 +19,8 @@ namespace CS2_Poor_MapAdvertisements.Models
         public bool forceOnVip { get; set; }
         public bool isOnGround { get; set; }
         public int depth { get; set; } 
+        public bool solid { get; set; }
+        public int opacity { get; set; } = 100;
 
         [JsonIgnore]
         public CBaseEntity? EntityProp { get; set; }

@@ -25,6 +25,7 @@ Map advert placements are stored separately in `addons/counterstrikesharp/config
 | Admin Flag (string) | Which flag will have access to all of the commands  |
 | Vip Flag (string) | Which flag would not see advertisements that are not forced on vip users |
 | Props Path (string[]) | Paths for all advertisements that your addon have |
+| Solid Material Variants (object) | Optional map from each normal `.vmat` to its solid-color `.vmat`. Enables the Current/Solid switch without changing existing defaults. |
 | Custom Position Values (int[]) | Custom values that will change position of the advert |
 | Custom Angle Values (int[]) | Custom values that will change rotation of the advert |
 | Enable commands (bool) | If you want commands to be enabled. (for example, after you placed all of the advertisements you might not need commands anymore) |
@@ -41,6 +42,9 @@ Map advert placements are stored separately in `addons/counterstrikesharp/config
     "materials/advert_3.vmat",
     "materials/advert_1.vmat"
   ],
+  "Solid Material Variants": {
+    "materials/decal_1.vmat": "materials/decal_1_solid.vmat"
+  },
   "Custom Position Values": [1,5,10],
   "Custom Angle Values": [1,5,10],
   "Enable commands": true,
@@ -80,6 +84,10 @@ Tried to make plugin idiot proof (since I did a lot of mistakes).
 | `css_mapadverts_self <auto\|hide\|show>` / `!mapadverts_self <auto\|hide\|show>` | Sets the current player's personal visibility preference. `auto` follows the global settings, `hide` hides advertisements for that player, and `show` keeps them visible when the global switch is enabled. Available to every player. |
 
 All commands are disabled when `Enable commands` is set to `false`. The global emergency switch always overrides personal visibility preferences.
+
+Decal creation and both ordinary/MatchZy editors support `Blend: Current/Solid`
+when a solid variant is configured, plus per-decal opacity from 10% to 100%.
+Existing placement JSON remains compatible: omitted values mean Current and 100%.
 
 While “Spawn on Ping” is enabled, the plugin temporarily sets the server's `player_ping_token_cooldown` to `0`, then restores its previous value once no admin is placing adverts via ping. This is a global server setting for that short setup period.
 

@@ -83,7 +83,7 @@ namespace CS2_Poor_MapAdvertisements.Managers
             }
         }
 
-        public PropModel? PushCordsToFile(Vector pos, QAngle angle, string ModelPath, float width, float height, bool forceToVip, int depth, bool isOnGround, int ModelGroupIndex, CBaseEntity entityProp)
+        public PropModel? PushCordsToFile(Vector pos, QAngle angle, string ModelPath, float width, float height, bool forceToVip, int depth, bool isOnGround, int ModelGroupIndex, CBaseEntity entityProp, int opacity = 100, bool solid = false)
         {
             lock (_fileLock)
             {
@@ -108,6 +108,8 @@ namespace CS2_Poor_MapAdvertisements.Managers
                     forceOnVip = forceToVip,
                     isOnGround = isOnGround,
                     depth = depth,
+                    opacity = DecalAppearanceRules.NormalizeOpacity(opacity),
+                    solid = solid,
                     EntityProp = entityProp
                 };
                 _props.Add(model);
@@ -153,7 +155,7 @@ namespace CS2_Poor_MapAdvertisements.Managers
                 }
                 else
                 {
-                    var ent = _plugin.PluginUtils!.CreateDecal(new Vector(prop.posX, prop.posY, prop.posZ), new QAngle(prop.angleX, prop.angleY, prop.angleZ), prop.modelPath!, prop.width, prop.height, prop.forceOnVip, prop.depth);
+                    var ent = _plugin.PluginUtils!.CreateDecal(new Vector(prop.posX, prop.posY, prop.posZ), new QAngle(prop.angleX, prop.angleY, prop.angleZ), prop.modelPath!, prop.width, prop.height, prop.forceOnVip, prop.depth, prop.opacity, prop.solid);
                     if (ent != null)
                     {
                         prop.EntityProp = ent;

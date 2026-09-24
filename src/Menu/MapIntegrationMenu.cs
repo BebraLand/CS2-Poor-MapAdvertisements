@@ -24,7 +24,7 @@ public partial class PluginMenu
         var settings = integration.GetPlacementSettings(player);
         var selectedMap = settings.MapNumber > 0 ? integration.MaterialLabel(settings.MapNumber) : "material not selected";
         var selectedSize = settings.Width > 0 && settings.Height > 0 && settings.Depth > 0
-            ? $"{settings.Width} x {settings.Height}, depth {settings.Depth}" : "size not selected";
+            ? $"{settings.Width} x {settings.Height}, depth {settings.Depth}, {(settings.Solid ? "solid" : "current")}, {settings.Opacity}%" : "size not selected";
         menu.AddItem($"New slot: {selectedMap}, {selectedSize}",
             (p, _) => ConfigurePlacementMenu(p, menu));
         AddIntegrationAction(menu, $"Creating map slots on ping: {integration.Placing.Contains(player)}", () => integration.TogglePlacement(player));
@@ -80,6 +80,17 @@ public partial class PluginMenu
             AddIntegrationAction(depth, "-1", () => integration.SetPlacementDepth(player, Math.Max(1, settings.Depth - 1)));
             depth.Display(p, 0);
         });
+        menu.AddItem($"Blend: {(settings.Solid ? "Solid" : "Current")}", (p, _) =>
+            integration.SetPlacementSolid(p, !settings.Solid),
+            disableOption: settings.MapNumber > 0 && integration.HasSolidVariant(settings.MapNumber)
+                ? DisableOption.None : DisableOption.DisableHideNumber);
+        menu.AddItem($"Opacity: {settings.Opacity}%", (p, _) =>
+        {
+            var opacity = new WasdMenu($"New slot opacity: {settings.Opacity}%", _plugin) { PrevMenu = menu };
+            AddIntegrationAction(opacity, "+10%", () => integration.SetPlacementOpacity(player, settings.Opacity + 10));
+            AddIntegrationAction(opacity, "-10%", () => integration.SetPlacementOpacity(player, settings.Opacity - 10));
+            opacity.Display(p, 0);
+        });
         menu.Display(player, 0);
     }
 
@@ -125,6 +136,15 @@ public partial class PluginMenu
             AddIntegrationAction(sizes, "Depth -1", () => ChangeSlot(slot, () => slot.depth = Math.Max(1, slot.depth - 1)), slot);
             sizes.Display(p, 0);
         });
+        AddIntegrationAction(menu, $"Blend: {(slot.solid ? "Solid" : "Current")}",
+            () => ChangeSlot(slot, () => slot.solid = !slot.solid), slot);
+        menu.AddItem($"Opacity: {slot.opacity}%", (p, _) =>
+        {
+            var opacity = new WasdMenu($"Slot opacity: {slot.opacity}%", _plugin) { PrevMenu = menu };
+            AddIntegrationAction(opacity, "+10%", () => ChangeSlot(slot, () => slot.opacity = Math.Min(100, slot.opacity + 10)), slot);
+            AddIntegrationAction(opacity, "-10%", () => ChangeSlot(slot, () => slot.opacity = Math.Max(10, slot.opacity - 10)), slot);
+            opacity.Display(p, 0);
+        });
         menu.AddItem("Position", (p, _) =>
         {
             var positions = new WasdMenu("Slot position", _plugin) { PrevMenu = menu };
@@ -167,12 +187,12 @@ public partial class PluginMenu
 
     private void ChangeSlot(PropModel slot, Action change)
     {
-        var old = (slot.posX, slot.posY, slot.posZ, slot.angleX, slot.angleY, slot.angleZ, slot.width, slot.height, slot.depth);
+        var old = (slot.posX, slot.posY, slot.posZ, slot.angleX, slot.angleY, slot.angleZ, slot.width, slot.height, slot.depth, slot.solid, slot.opacity);
         change();
         try { _plugin.MapIntegration!.Save(); }
         catch
         {
-            (slot.posX, slot.posY, slot.posZ, slot.angleX, slot.angleY, slot.angleZ, slot.width, slot.height, slot.depth) = old;
+            (slot.posX, slot.posY, slot.posZ, slot.angleX, slot.angleY, slot.angleZ, slot.width, slot.height, slot.depth, slot.solid, slot.opacity) = old;
             throw;
         }
         _plugin.MapIntegration!.ClearEntities();

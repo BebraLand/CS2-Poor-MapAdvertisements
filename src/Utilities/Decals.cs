@@ -1,6 +1,8 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using CS2_Poor_MapAdvertisements.Managers;
+using System.Drawing;
 
 namespace CS2_Poor_MapAdvertisements.Utils;
 
@@ -11,7 +13,7 @@ public partial class PluginUtils
     */
     public const int DecalDepth = 12;
     private const float DecalBackwardOffset = 2f;
-    public CEnvDecal? CreateDecal(Vector cords, QAngle angle, string material, float width, float height, bool forceOnVip, int depth)
+    public CEnvDecal? CreateDecal(Vector cords, QAngle angle, string material, float width, float height, bool forceOnVip, int depth, int opacity = 100, bool solid = false)
     {
         try
         {
@@ -27,17 +29,21 @@ public partial class PluginUtils
             }
 
             keyValues.SetString("targetname", entity.Entity.Name);
-            keyValues.SetString("material", material);
+            keyValues.SetString("material", DecalAppearanceRules.ResolveMaterial(material, solid, _plugin.Config.SolidMaterialVariants));
 
             entity.Width = width;
             entity.Height = height;
             entity.Depth = depth;
             entity.RenderOrder = 1;
-            entity.RenderMode = RenderMode_t.kRenderNormal;
+            opacity = DecalAppearanceRules.NormalizeOpacity(opacity);
             entity.ProjectOnWorld = true;
 
             entity.Teleport(cords, angle);
             entity.DispatchSpawn(keyValues);
+            entity.RenderMode = opacity == 100 ? RenderMode_t.kRenderNormal : RenderMode_t.kRenderTransAlpha;
+            entity.Render = Color.FromArgb(opacity * 255 / 100, 255, 255, 255);
+            Utilities.SetStateChanged(entity, "CBaseModelEntity", "m_nRenderMode");
+            Utilities.SetStateChanged(entity, "CBaseModelEntity", "m_clrRender");
             return entity;
         }
         catch (Exception error)
@@ -69,13 +75,13 @@ public partial class PluginUtils
             if (eyeAngleZ < -0.90)
             {
                 offsetPos.Z += 1f;
-                var entity = CreateDecal(offsetPos, new QAngle(0, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth);
-                var model = _plugin.PropManager!.PushCordsToFile(offsetPos, new QAngle(0, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth, false, 0, entity!);
+                var entity = CreateDecal(offsetPos, new QAngle(0, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth, selected.opacity, selected.solid);
+                var model = _plugin.PropManager!.PushCordsToFile(offsetPos, new QAngle(0, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth, false, 0, entity!, selected.opacity, selected.solid);
             }
             else
             {
-                var entity = CreateDecal(offsetPos, new QAngle(90, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth);
-                var model = _plugin.PropManager!.PushCordsToFile(offsetPos, new QAngle(90, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth, false, 0, entity!);
+                var entity = CreateDecal(offsetPos, new QAngle(90, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth, selected.opacity, selected.solid);
+                var model = _plugin.PropManager!.PushCordsToFile(offsetPos, new QAngle(90, spriteAngle.Y, 0), selected.material!, selected.width, selected.height, selected.isVip, selected.depth, false, 0, entity!, selected.opacity, selected.solid);
                 if (entity != null)
                 {
                     model!.EntityProp = entity;

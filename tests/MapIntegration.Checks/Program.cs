@@ -34,4 +34,8 @@ Check(!AdvertisementVisibilityRules.ShouldHide(true, AdvertisementAudience.Spect
 Check(AdvertisementVisibilityRules.ShouldHide(true, AdvertisementAudience.Everyone, AdvertisementPreference.Hidden, false, false, "advert_decals_"), "Personal hidden wins");
 Check(!AdvertisementVisibilityRules.ShouldHide(true, AdvertisementAudience.Spectators, AdvertisementPreference.Visible, true, false, "advert_decals_"), "Personal visible overrides audience");
 Check(AdvertisementVisibilityRules.ShouldHide(true, AdvertisementAudience.Everyone, AdvertisementPreference.Visible, false, true, "advert_decals__force"), "VIP filtering preserved");
+var variants = new Dictionary<string, string> { ["materials/logo.vmat"] = "materials/logo_solid.vmat" };
+Check(DecalAppearanceRules.ResolveMaterial("materials/logo.vmat", false, variants) == "materials/logo.vmat", "Current blend stays default");
+Check(DecalAppearanceRules.ResolveMaterial("materials/logo.vmat", true, variants) == "materials/logo_solid.vmat", "Solid blend resolves variant");
+Check(DecalAppearanceRules.NormalizeOpacity(0) == 10 && DecalAppearanceRules.NormalizeOpacity(120) == 100, "Opacity is bounded");
 Console.WriteLine($"PASS: {checks} Map Integration checks.");

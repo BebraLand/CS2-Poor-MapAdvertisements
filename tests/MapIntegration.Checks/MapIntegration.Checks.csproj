@@ -9,5 +9,6 @@
     <Compile Include="../../../MatchZy-Enhanced/src/MapAdvertisementRules.cs" Link="MapAdvertisementRules.cs" />
     <Compile Include="../../src/Managers/MapIntegrationRules.cs" Link="MapIntegrationRules.cs" />
     <Compile Include="../../src/Managers/AdvertisementVisibilityRules.cs" Link="AdvertisementVisibilityRules.cs" />
+    <Compile Include="../../src/Managers/DecalAppearanceRules.cs" Link="DecalAppearanceRules.cs" />
   </ItemGroup>
 </Project>

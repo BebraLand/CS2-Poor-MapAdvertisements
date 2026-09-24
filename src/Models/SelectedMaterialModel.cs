@@ -10,5 +10,7 @@ namespace CS2_Poor_MapAdvertisements.Models
         public float height { get;set; }
         public int depth { get;set; }
         public bool onPing { get;set; }
+        public bool solid { get;set; }
+        public int opacity { get;set; } = 100;
     }
 }

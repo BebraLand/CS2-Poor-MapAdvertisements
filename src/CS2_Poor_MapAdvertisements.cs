@@ -56,6 +56,7 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
     public void OnConfigParsed(PluginConfig config)
     {
         config.MapIntegration ??= new();
+        config.SolidMaterialVariants ??= [];
         Config = config;
     }
     public override void Unload(bool hotReload)

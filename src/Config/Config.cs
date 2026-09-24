@@ -15,6 +15,9 @@ namespace CS2_Poor_MapAdvertisements.Config
         [JsonPropertyName("Props Path")]
         public string[] Props { get; set; } = [];
 
+        [JsonPropertyName("Solid Material Variants")]
+        public Dictionary<string, string> SolidMaterialVariants { get; set; } = [];
+
         [JsonPropertyName("MatchZy Map Integration")]
         public MapIntegrationConfig MapIntegration { get; set; } = new();
 
