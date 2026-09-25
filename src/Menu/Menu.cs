@@ -1,6 +1,8 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Utils;
+using CS2_Poor_MapAdvertisements.Managers;
 using CS2_Poor_MapAdvertisements.Models;
 using CS2MenuManager.API.Enum;
 using CS2MenuManager.API.Menu;
@@ -15,6 +17,38 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
     public Dictionary<CCSPlayerController, PropModel> _listenForChat = new();
     private string[] _retardedWayCords = ["X+", "X-", "Y+", "Y-", "Z+", "Z-"];
     private int[] _decalSize = [16, 32, 64, 128, 256, 512, 1024];
+
+    public void ShowAdvertisementPreferenceMenu(CCSPlayerController player)
+    {
+        if (player?.IsValid != true) return;
+
+        var preference = _plugin.GetAdvertisementPreference(player);
+        var mode = _plugin.Localizer.ForPlayer(player, $"AdsMode_{preference}");
+        var audience = !_plugin.AdvertisementsVisible ? "AdsAudience_Off"
+            : _plugin.AdvertisementAudience == AdvertisementAudience.Spectators ? "AdsAudience_Spectators"
+            : "AdsAudience_Everyone";
+        var menu = new WasdMenu(_plugin.Localizer.ForPlayer(player, "AdsMenu_Header"), _plugin);
+        menu.AddItem(_plugin.Localizer.ForPlayer(player, "AdsMenu_Current", mode), DisableOption.DisableHideNumber);
+        menu.AddItem(_plugin.Localizer.ForPlayer(player, "AdsMenu_Audience", _plugin.Localizer.ForPlayer(player, audience)), DisableOption.DisableHideNumber);
+
+        AddAdvertisementPreferenceOption(menu, player, AdvertisementPreference.Auto, "AdsMenu_Auto");
+        AddAdvertisementPreferenceOption(menu, player, AdvertisementPreference.Hidden, "AdsMenu_Hide");
+        AddAdvertisementPreferenceOption(menu, player, AdvertisementPreference.Visible, "AdsMenu_Show");
+        menu.Display(player, 0);
+    }
+
+    private void AddAdvertisementPreferenceOption(WasdMenu menu, CCSPlayerController player,
+        AdvertisementPreference preference, string label)
+    {
+        menu.AddItem(_plugin.Localizer.ForPlayer(player, label), (p, option) =>
+        {
+            if (!p.IsValid) return;
+            _plugin.CommandsManager!.ApplyPersonalAdvertisementPreference(p, preference);
+            option.PostSelectAction = PostSelectAction.Close;
+            Server.NextFrame(() => ShowAdvertisementPreferenceMenu(p));
+        });
+    }
+
     public void ShowMapAdvertMenu(CCSPlayerController player)
     {
         if (player == null) return;
@@ -48,7 +82,7 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
             menu.AddItem($"{_plugin.Localizer["UndoLastAdvertMenu"]}", (p, o) =>
             {
                 var removedId = _plugin.PropManager.UndoLastPlacement();
-                p.PrintToChat($"{_plugin.Localizer["Prefix"]}{(removedId.HasValue ? _plugin.Localizer["SuccessUndo", removedId.Value] : _plugin.Localizer["NothingToUndo"])}");
+                p.PrintToChat($"{_plugin.ChatPrefix}{(removedId.HasValue ? _plugin.Localizer["SuccessUndo", removedId.Value] : _plugin.Localizer["NothingToUndo"])}");
                 o.PostSelectAction = PostSelectAction.Close;
                 Server.NextFrame(() => ShowMapAdvertMenu(p));
             });
@@ -67,11 +101,11 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
             try
             {
                 _plugin.PropManager!.SaveAllAdverts();
-                p.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["SavedAdverts"]}");
+                p.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer["SavedAdverts"]}");
             }
             catch (Exception error)
             {
-                p.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["SavedAdvertsError"]}");
+                p.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer["SavedAdvertsError"]}");
                 _plugin.DebugMode($"{error}");
             }
 
@@ -132,7 +166,7 @@ public partial class PluginMenu(CS2_Poor_MapAdvertisements plugin)
         menu.AddItem($"{_plugin.Localizer["RemoveAllAdvertsConfirm"]}", (p, o) =>
         {
             var removedCount = _plugin.PropManager.RemoveAllProps();
-            p.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["SuccessRemoveAll", removedCount]}");
+            p.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer["SuccessRemoveAll", removedCount]}");
             o.PostSelectAction = PostSelectAction.Close;
             Server.NextFrame(() => ShowMapAdvertMenu(p));
         });

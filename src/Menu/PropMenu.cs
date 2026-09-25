@@ -181,7 +181,7 @@ public partial class PluginMenu
         {
             _listenForChat.Add(player, prop);
 
-            player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["NotificationSkin"]}");
+            player.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer["NotificationSkin"]}");
 
             o.PostSelectAction = PostSelectAction.Nothing;
         });
@@ -208,7 +208,7 @@ public partial class PluginMenu
         menu.AddItem($"{_plugin.Localizer[$"SavePropConfig"]}", (p, o) =>
         {
             _plugin.PropManager!.SavePropConfiguration(entity.As<CPhysicsPropOverride>(), prop);
-            player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer[$"SavedProp", prop.Id]}");
+            player.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer[$"SavedProp", prop.Id]}");
             Server.NextFrame(() =>
             {
                 EditPropsMenu(player, (WasdMenu)prevMenu.PrevMenu!);

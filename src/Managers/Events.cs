@@ -1,6 +1,7 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Admin;
+using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
 using CounterStrikeSharp.API.Modules.Cvars;
 using CounterStrikeSharp.API.Modules.Utils;
@@ -17,6 +18,8 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         //Events:
         _plugin.RegisterEventHandler<EventRoundStart>(OnRoundStart);
         _plugin.RegisterEventHandler<EventPlayerPing>(OnPlayerPing);
+        if (_plugin.Config.EnableCMD)
+            _plugin.RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnectFull);
 
         //Listeners:
         _plugin.RegisterListener<Listeners.OnServerPrecacheResources>((ResourceManifest manifest) =>
@@ -35,6 +38,26 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         _plugin.RegisterListener<Listeners.OnTick>(OnTick);
         _plugin.AddCommandListener("say", OnPlayerChatListener);
         _plugin.AddCommandListener("say_team", OnPlayerChatListener);
+    }
+
+    private HookResult OnPlayerConnectFull(EventPlayerConnectFull @event, GameEventInfo info)
+    {
+        var player = @event.Userid;
+        if (player == null || !player.IsValid || player.IsBot || player.IsHLTV) return HookResult.Continue;
+
+        bool hasAdvertisements = _plugin.PropManager?._props.Count > 0
+            || _plugin.MapIntegration?.Slots.Count > 0
+            || _plugin.Config.Props?.Any(path => !string.IsNullOrWhiteSpace(path)) == true
+            || (_plugin.Config.MapIntegration?.Enabled == true
+                && _plugin.Config.MapIntegration.Materials?.Any(path => !string.IsNullOrWhiteSpace(path)) == true);
+        if (hasAdvertisements)
+            Server.NextFrame(() =>
+            {
+                if (player.IsValid && !player.IsBot && !player.IsHLTV)
+                    player.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer.ForPlayer(player, "AdsHint")}");
+            });
+
+        return HookResult.Continue;
     }
 
     private void OnTick()
@@ -93,13 +116,13 @@ public class EventManager(CS2_Poor_MapAdvertisements plugin)
         if(string.IsNullOrWhiteSpace(msg)) return HookResult.Continue;
         if(!int.TryParse(msg, out int value))
         {
-            player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["NoArg"]}");
+            player.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer["NoArg"]}");
             return HookResult.Continue;
         }
 
         _plugin.MenuManager._listenForChat[player].ModelGroupIndex = value;
         
-        player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer[$"PlayerSelectedSkin", value]}");
+        player.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer[$"PlayerSelectedSkin", value]}");
 
         _plugin.MenuManager._listenForChat[player].EntityProp!.AcceptInput("Skin", _plugin.MenuManager._listenForChat[player].EntityProp, _plugin.MenuManager._listenForChat[player].EntityProp, value.ToString());
 

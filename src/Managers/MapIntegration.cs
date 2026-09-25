@@ -27,7 +27,24 @@ public sealed class MapIntegration(CS2_Poor_MapAdvertisements plugin)
         new("matchzy:current_map_number:v1");
     private static readonly PluginCapability<int> SeriesLengthCapability =
         new("matchzy:series_length:v1");
+    private static readonly PluginCapability<string> ChatPrefixCapability =
+        new("matchzy:chat_prefix:v1");
     public int CurrentMapNumber { get; private set; }
+    public string? MatchZyChatPrefix
+    {
+        get
+        {
+            try
+            {
+                var prefix = ChatPrefixCapability.Get();
+                return string.IsNullOrWhiteSpace(prefix) ? null : prefix;
+            }
+            catch (KeyNotFoundException)
+            {
+                return null;
+            }
+        }
+    }
     public bool IsPlacing => Placing.Any();
     public bool HasUndo => undo.Any(Slots.Contains);
 

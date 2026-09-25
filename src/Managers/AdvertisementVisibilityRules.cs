@@ -24,9 +24,8 @@ public static class AdvertisementVisibilityRules
         string? entityName)
         => entityName?.StartsWith("advert", StringComparison.Ordinal) == true
             && (!advertisementsVisible
-                || (isVip && entityName.Contains("force", StringComparison.Ordinal))
                 || preference == AdvertisementPreference.Hidden
                 || (preference == AdvertisementPreference.Auto
-                    && audience == AdvertisementAudience.Spectators
-                    && isActivePlayer));
+                    && ((isVip && entityName.Contains("force", StringComparison.Ordinal))
+                        || (audience == AdvertisementAudience.Spectators && isActivePlayer))));
 }

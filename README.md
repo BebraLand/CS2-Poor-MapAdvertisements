@@ -81,9 +81,15 @@ Tried to make plugin idiot proof (since I did a lot of mistakes).
 | `css_mapadverts_undo` / `!mapadverts_undo` | Removes the last ordinary advert placement made since the current map load. Admin flag required. |
 | `css_mapadverts_toggle` / `!mapadverts_toggle` | Emergency global visibility switch. Hides or shows all advertisements immediately for everyone. Admin flag or server console. |
 | `css_mapadverts_audience <all\|spectators>` / `!mapadverts_audience <all\|spectators>` | Chooses whether advertisements are visible to everyone or only spectators. The change is applied in real time. Admin flag or server console. `everyone` and `observers` are accepted aliases. |
-| `css_mapadverts_self <auto\|hide\|show>` / `!mapadverts_self <auto\|hide\|show>` | Sets the current player's personal visibility preference. `auto` follows the global settings, `hide` hides advertisements for that player, and `show` keeps them visible when the global switch is enabled. Available to every player. |
+| `css_ads` / `!ads` | Opens a short personal visibility menu. Available to every player without an admin flag. A one-time join hint points players to this command when adverts are configured. |
+| `css_ads <auto\|hide\|show>` / `!ads <auto\|hide\|show>` | Quick options: `auto` follows the match audience, `hide` hides images only for you, and `show` displays them to you even when the match audience is spectators-only. `default`, `off`, and `on` are accepted aliases. |
+| `css_mapadverts_self [auto\|hide\|show]` / `!mapadverts_self [auto\|hide\|show]` | Backwards-compatible long form of `css_ads`; no argument opens the same menu. Available to every player without an admin flag. |
 
-All commands are disabled when `Enable commands` is set to `false`. The global emergency switch always overrides personal visibility preferences.
+All commands are disabled when `Enable commands` is set to `false`. Personal preferences apply only to the player who selected them and last until the plugin or server restarts. The global emergency switch always overrides personal visibility preferences.
+
+Chat messages use MatchZy's configured `matchzy_chat_prefix` when the matching
+optional capability is available; otherwise the plugin uses its localized
+`[Map Ads]` prefix.
 
 Decal creation and both ordinary/MatchZy editors support `Blend: Current/Solid`
 when a solid variant is configured, plus per-decal opacity from 10% to 100%.

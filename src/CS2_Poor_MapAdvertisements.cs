@@ -23,6 +23,7 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
     public EventManager? EventManager { get; private set; }
     public PropManager? PropManager { get; private set; }
     public MapIntegration? MapIntegration { get; private set; }
+    public string ChatPrefix => $"{(MapIntegration?.MatchZyChatPrefix ?? Localizer["Prefix"]).TrimEnd()} ";
     public bool AdvertisementsVisible { get; set; } = true;
     public AdvertisementAudience AdvertisementAudience { get; set; } = AdvertisementAudience.Everyone;
     public Dictionary<ulong, AdvertisementPreference> AdvertisementPreferences { get; } = [];
@@ -92,6 +93,16 @@ public class CS2_Poor_MapAdvertisements : BasePlugin, IPluginConfig<PluginConfig
 
     public AdvertisementPreference GetAdvertisementPreference(CCSPlayerController player)
         => AdvertisementPreferences.GetValueOrDefault(player.SteamID, AdvertisementPreference.Auto);
+
+    public void SetAdvertisementPreference(CCSPlayerController player, AdvertisementPreference preference)
+    {
+        if (GetAdvertisementPreference(player) == preference) return;
+        if (preference == AdvertisementPreference.Auto)
+            AdvertisementPreferences.Remove(player.SteamID);
+        else
+            AdvertisementPreferences[player.SteamID] = preference;
+        RefreshAdvertisementVisibility();
+    }
 
     public void RefreshAdvertisementVisibility()
     {

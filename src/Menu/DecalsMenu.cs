@@ -24,7 +24,7 @@ public partial class PluginMenu
 
         if (nearest == null)
         {
-            player.PrintToChat($"{_plugin.Localizer["Prefix"]}No decals found.");
+            player.PrintToChat($"{_plugin.ChatPrefix}No decals found.");
             return;
         }
 
@@ -348,7 +348,7 @@ public partial class PluginMenu
             {
                 if (_plugin.PropManager!.RemovePropFromFile(prop.Id))
                 {
-                    who.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer["SuccessRemove", propId]}");
+                    who.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer["SuccessRemove", propId]}");
                 }
 
                 option.PostSelectAction = PostSelectAction.Close;
@@ -457,7 +457,7 @@ public partial class PluginMenu
         menu.AddItem($"{_plugin.Localizer[$"SavePropConfig"]}", (p, o) =>
         {
             _plugin.PropManager!.SavePropConfiguration(entity.As<CPhysicsPropOverride>(), prop);
-            player.PrintToChat($"{_plugin.Localizer["Prefix"]}{_plugin.Localizer[$"SavedProp", prop.Id]}");
+            player.PrintToChat($"{_plugin.ChatPrefix}{_plugin.Localizer[$"SavedProp", prop.Id]}");
             Server.NextFrame(() =>
             {
                 if (prevMenu?.PrevMenu is WasdMenu parent)

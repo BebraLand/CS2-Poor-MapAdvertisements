@@ -1,0 +1,22 @@
+{
+	"Prefix": "{lime}[Картинки на карте]{default}",
+	"MapAdvertMenu_Header": "Картинки на карте",
+	"AdsHint": "Турнирные картинки на карте: !ads — изменить видимость.",
+	"AdsMenu_Header": "Картинки на карте",
+	"AdsMenu_Current": "У меня: {0}",
+	"AdsMode_Auto": "АВТО",
+	"AdsMode_Hidden": "СКРЫТЫ",
+	"AdsMode_Visible": "ПОКАЗЫВАЮТСЯ",
+	"AdsMenu_Audience": "На сервере: {0}",
+	"AdsAudience_Off": "ВЫКЛЮЧЕНЫ",
+	"AdsAudience_Everyone": "Все",
+	"AdsAudience_Spectators": "Зрители",
+	"AdsMenu_Auto": "Как на сервере (АВТО)",
+	"AdsMenu_Hide": "Скрыть только у меня",
+	"AdsMenu_Show": "Показывать мне",
+	"AdsUsage": "Команда: !ads [auto|hide|show]. Без аргумента !ads открывает меню.",
+	"AdsApplied_Auto": "Теперь ты следуешь настройкам видимости матча.",
+	"AdsApplied_Hide": "Картинки на карте скрыты только для тебя.",
+	"AdsApplied_Show": "Картинки будут видны тебе, даже если сервер скрыл их от игроков.",
+	"AdsApplied_GlobalOff": "Выбор сохранён, но администратор отключил картинки на карте для всех."
+}
